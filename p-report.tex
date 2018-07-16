@@ -1,6 +1,8 @@
-\documentclass[twocolumn]{preport}
+\documentclass[onecolumn]{preport}
 \usepackage[dvipdfmx]{graphicx}
 \graphicspath{{figs/}}
+
+\usepackage{listings}
 
 \title{1192年度 研究要旨: \\
 プログレスレポートのテンプレート}
@@ -46,6 +48,84 @@
   \label{table:sample}
  \end{center}
 \end{table}
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+#include <iostream>
+#include <stdlib.h>
+#include <time.h>
+
+#define N 100
+double A[N][N], B[N][N], C[N][N];
+
+int main(){
+  /* initialize */
+  srand((unsigned int)time(NULL));
+  for(int i=0; i<N; i++){
+    for(int j=0; j<N; j++){
+      A[i][j] = 1.0 * rand() / RAND_MAX;
+      B[i][j] = 1.0 * rand() / RAND_MAX;
+      C[i][j] = 0.0;
+    }
+  }
+  std::cout << "initialization finish" << std::endl;
+
+  clock_t start = clock();
+  for(int i=0; i<N; i++)
+    for(int j=0; j<N; j++)
+      for(int k=0; k<N; k++)
+	C[i][j] += A[i][k] * B[k][j];
+  clock_t end = clock();
+  std::cout << 1e+3 * (double)(end-start) / CLOCKS_PER_SEC << " msec." << std::endl;
+
+  return 0;
+}
+\end{lstlisting}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+public class mat {
+    public static void main(String[] args){
+	int N = 100;
+	double[][] A = new double[N][N];
+	double[][] B = new double[N][N];
+	double[][] C = new double[N][N];
+	for(int i=0; i<N; i++){
+	    for(int j=0; j<N; j++){
+		A[i][j] = Math.random();
+		B[i][j] = Math.random();
+		C[i][j] = 0.0;
+	    }
+	}
+	System.out.println("initialization finish");
+
+	long start = System.currentTimeMillis();
+	for(int i=0; i<N; i++)
+	    for(int j=0; j<N; j++)
+		for(int k=0; k<N; k++)
+		    C[i][j] += A[i][k] * B[k][j];
+	long end = System.currentTimeMillis();
+	System.out.println((end-start) + " msecs.");
+
+    }
+}
+\end{lstlisting}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+import random
+import time
+
+if __name__ == '__main__':
+    N = 100
+    A = [[random.uniform(0.0, 1.0) for i in range(N)] for j in range(N)]
+    B = [[random.uniform(0.0, 1.0) for i in range(N)] for j in range(N)]
+    C = [[0.0 for i in range(N)] for j in range(N)]
+    print("initialization finish")
+
+    start = time.time()
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                C[i][j] += A[i][k] * B[k][j]
+    end = time.time()
+    print("{} msec.".format((end-start)*1e+3))
+\end{lstlisting}
 
 \section{おわりに}
 
