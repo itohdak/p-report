@@ -4,9 +4,8 @@
 
 \usepackage{listings}
 
-\title{1192年度 研究要旨: \\
-プログレスレポートのテンプレート}
-\author{1192年 源頼朝}
+\title{クラウド基盤ソフトウェア レポート課題2}
+\author{48-186619 創造情報学専攻 伊藤秀朗}
 
 \begin{document}
 
@@ -15,42 +14,63 @@
 \thispagestyle{empty}
 \sloppy
 
-\section{はじめに}
+\section{目的}
+事前に機械語にコンパイルされる言語，JVM上で動作する言語，動的型言語の3種類で，同等の処理を行うプログラムを作成し，その実行速度を比較する．言語としてはそれぞれ，C++，Java，Pythonを用いた．
 
-本稿はプログレスレポートのテンプレートである\cite{Sakai}．
+\section{処理内容}
+今回3種類の言語にて行わせる処理としては行列積を採用した．具体的には，100x100の行列（配列）を2つ用意し，その行列積を計算する．同じ操作を10回繰り返し，実行時間の変化を見た．最後に，10回のうち最小の実行時間を出力する．
 
-本稿における「、」や「。」は、\verb|make pub|を実行することで、「，」や「．」に変更される。
-
-図は\figref{nowprinting}や\tabref{sample}として参照する．
-
-\begin{figure}[tbh]
- \begin{center}
-  \begin{minipage}{0.3\columnwidth}
-   \includegraphics[width=\columnwidth]{nowprinting.eps}
-   \caption{eps図の参考例}
-  \end{minipage}
-  \hspace{0.15\columnwidth}
-  \begin{minipage}{0.3\columnwidth}
-   \includegraphics[width=\columnwidth]{dj.jpg}
-   \caption{jpg図の参考例}
-  \end{minipage}
-  \label{figure:nowprinting}
- \end{center}
-\end{figure}
-
+\section{実行環境}
 \begin{table}[tbh]
- \begin{center}
-  \begin{tabular}{|l|r|} \hline
-  A1 & B1 \\
-  A2 & B2 \\ \hline
+  \begin{tabular}{ll}
+    OS: & Linux 4.13.0-45-generic\\
+    CPU: & Intel(R) Core(TM) i7-6600U CPU @ 2.60GHz\\
+    Total memory: & 24GB\\
+    Compiler version: & g++ 5.4.0\\
+    Compile option: & -O3\\
+    JVM version: & JDK 1.8.0\_171\\
+    Python version: & Python 2.7.12\\
   \end{tabular}
-  \caption{図の参考例}
-  \label{table:sample}
- \end{center}
 \end{table}
 
-\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+
+%% 本稿はプログレスレポートのテンプレートである\cite{Sakai}．
+
+%% 本稿における「、」や「。」は、\verb|make pub|を実行することで、「，」や「．」に変更される。
+
+%% 図は\figref{nowprinting}や\tabref{sample}として参照する．
+
+%% \begin{figure}[tbh]
+%%  \begin{center}
+%%   \begin{minipage}{0.3\columnwidth}
+%%    \includegraphics[width=\columnwidth]{nowprinting.eps}
+%%    \caption{eps図の参考例}
+%%   \end{minipage}
+%%   \hspace{0.15\columnwidth}
+%%   \begin{minipage}{0.3\columnwidth}
+%%    \includegraphics[width=\columnwidth]{dj.jpg}
+%%    \caption{jpg図の参考例}
+%%   \end{minipage}
+%%   \label{figure:nowprinting}
+%%  \end{center}
+%% \end{figure}
+
+%% \begin{table}[tbh]
+%%  \begin{center}
+%%   \begin{tabular}{|l|r|} \hline
+%%   A1 & B1 \\
+%%   A2 & B2 \\ \hline
+%%   \end{tabular}
+%%   \caption{図の参考例}
+%%   \label{table:sample}
+%%  \end{center}
+%% \end{table}
+
+\section{ソースコードと実行方法}
+\subsection{C++}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single, caption=mat.cpp]
 #include <iostream>
+#include <iomanip>
 #include <stdlib.h>
 #include <time.h>
 
@@ -67,70 +87,201 @@ int main(){
       C[i][j] = 0.0;
     }
   }
-  std::cout << "initialization finish" << std::endl;
+  std::cout << ``initialization finish'' << std::endl;
 
-  clock_t start = clock();
-  for(int i=0; i<N; i++)
-    for(int j=0; j<N; j++)
+  double best = 1000000;
+  for(int n=0; n<10; n++){
+    clock_t start = clock();
+    for(int i=0; i<N; i++)
+      for(int j=0; j<N; j++)
       for(int k=0; k<N; k++)
-	C[i][j] += A[i][k] * B[k][j];
-  clock_t end = clock();
-  std::cout << 1e+3 * (double)(end-start) / CLOCKS_PER_SEC << " msec." << std::endl;
+        C[i][j] += A[i][k] * B[k][j];
+    clock_t end = clock();
+    if(best > 1e+3 * (double)(end-start) / CLOCKS_PER_SEC)
+      best = 1e+3 * (double)(end-start) / CLOCKS_PER_SEC;
+    std::cout << std::fixed
+          << std::setprecision(2) << 1e+3 * (double)(end-start) / CLOCKS_PER_SEC << `` msec.'' << std::endl;
+
+    /* initialize */
+    for(int i=0; i<N; i++)
+      for(int j=0; j<N; j++)
+      C[i][j] = 0.0;
+  }
+  std::cout << std::fixed
+      << std::setprecision(2) << best << `` msec.'' << std::endl;
 
   return 0;
 }
 \end{lstlisting}
 \begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+$ g++ mat.cpp -O3
+$ ./a.out
+\end{lstlisting}
+
+\subsection{Java}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single, caption=mat.java]
 public class mat {
     public static void main(String[] args){
-	int N = 100;
-	double[][] A = new double[N][N];
-	double[][] B = new double[N][N];
-	double[][] C = new double[N][N];
-	for(int i=0; i<N; i++){
-	    for(int j=0; j<N; j++){
-		A[i][j] = Math.random();
-		B[i][j] = Math.random();
-		C[i][j] = 0.0;
-	    }
-	}
-	System.out.println("initialization finish");
+int N = 100;
+double[][] A = new double[N][N];
+double[][] B = new double[N][N];
+double[][] C = new double[N][N];
+/* initialize */
+for(int i=0; i<N; i++){
+    for(int j=0; j<N; j++){
+A[i][j] = Math.random();
+B[i][j] = Math.random();
+C[i][j] = 0.0;
+    }
+}
+System.out.println(``initialization finish'');
 
-	long start = System.currentTimeMillis();
-	for(int i=0; i<N; i++)
-	    for(int j=0; j<N; j++)
-		for(int k=0; k<N; k++)
-		    C[i][j] += A[i][k] * B[k][j];
-	long end = System.currentTimeMillis();
-	System.out.println((end-start) + " msecs.");
+double best = 1000000;
+for(int n=0; n<10; n++){
+    long start = System.nanoTime();
+    for(int i=0; i<N; i++)
+for(int j=0; j<N; j++)
+    for(int k=0; k<N; k++)
+C[i][j] += A[i][k] * B[k][j];
+    long end = System.nanoTime();
+    if(best > (end-start)/1e+6)
+best = (end-start)/1e+6;
+    System.out.println(String.format(``%6.2f'', (end-start)/1e+6) + `` msec.'');
 
+    /* initialize */
+    for(int i=0; i<N; i++)
+for(int j=0; j<N; j++)
+    C[i][j] = 0.0;
+}
+System.out.println(String.format(``%6.2f'', best) + `` msec.'');
     }
 }
 \end{lstlisting}
 \begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+$ javac mat.java
+$ java mat
+\end{lstlisting}
+
+\subsection{Python}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single, caption=mat.py]
 import random
 import time
 
 if __name__ == '__main__':
     N = 100
+    # initialize
     A = [[random.uniform(0.0, 1.0) for i in range(N)] for j in range(N)]
     B = [[random.uniform(0.0, 1.0) for i in range(N)] for j in range(N)]
     C = [[0.0 for i in range(N)] for j in range(N)]
-    print("initialization finish")
+    print(``initialization finish'')
 
-    start = time.time()
-    for i in range(N):
-        for j in range(N):
-            for k in range(N):
-                C[i][j] += A[i][k] * B[k][j]
-    end = time.time()
-    print("{} msec.".format((end-start)*1e+3))
+    best = 1000000
+    for n in range(10):
+        start = time.time()
+        for i in range(N):
+            for j in range(N):
+                for k in range(N):
+                    C[i][j] += A[i][k] * B[k][j]
+        end = time.time()
+        if best > (end-start)*1e+3:
+            best = (end-start)*1e+3
+        print(``{0:6.2f} msec.''.format((end-start)*1e+3))
+
+        # initialize
+        C = [[0.0 for i in range(N)] for j in range(N)]
+    print(``{0:6.2f} msec.''.format(best))
+\end{lstlisting}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+$ python mat.py
 \end{lstlisting}
 
-\section{おわりに}
+\section{結果}
+以下は，行列の大きさを表すNがN=100のときの実行結果である．
+動的型言語であるPythonは，他の2つに比べて，実行時間が100倍以上大きいことがわかる．
+C++とJavaとの比較においては，N=100のときには，最小実行時間にあまり差は見られない．最大実行時間はJavaのほうが大きく出ている．ここには示していないが，Javaでの複数回の試行において，高い確率で1回目と3回目で，他と比較して大きい実行時間を記録しており，JVMの実行の仕組みが関係していそうな特徴がある．
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+$ ./a.out
+initialization finish
+5.56 msec.
+5.47 msec.
+5.46 msec.
+4.30 msec.
+3.29 msec.
+2.55 msec.
+2.42 msec.
+1.80 msec.
+1.80 msec.
+1.69 msec.
+1.69 msec.
+\end{lstlisting}
 
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+$ java mat
+initialization finish
+ 10.71 msec.
+  1.99 msec.
+ 30.92 msec.
+  1.32 msec.
+  1.19 msec.
+  1.21 msec.
+  1.25 msec.
+  1.47 msec.
+  1.98 msec.
+  1.99 msec.
+  1.19 msec.
+\end{lstlisting}
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+$ python mat.py
+initialization finish
+208.97 msec.
+206.84 msec.
+208.16 msec.
+227.97 msec.
+220.70 msec.
+212.56 msec.
+210.64 msec.
+208.89 msec.
+214.86 msec.
+212.89 msec.
+206.84 msec.
+\end{lstlisting}
+
+N=1000に変更して，実行してみた結果を以下に示す．N=1000では，C++のほうが実行時間が小さくなった．
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+$ ./a.out
+initialization finish
+1852.78 msec.
+1827.35 msec.
+1836.57 msec.
+1879.23 msec.
+1845.83 msec.
+1819.49 msec.
+1817.25 msec.
+1844.97 msec.
+1859.28 msec.
+1843.92 msec.
+1817.25 msec.
+\end{lstlisting}
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+$ java mat
+initialization finish
+6026.17 msec.
+6064.88 msec.
+6061.86 msec.
+6073.92 msec.
+6050.69 msec.
+6051.95 msec.
+6054.98 msec.
+6034.34 msec.
+6019.58 msec.
+6063.23 msec.
+6019.58 msec.
+\end{lstlisting}
 \bibliographystyle{junsrt}
-\bibliography{p-report}
+%% \bibliography{p-report}
 
 \end{document}
 
