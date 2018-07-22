@@ -1,10 +1,11 @@
-\documentclass[twocolumn]{preport}
+\documentclass[onecolumn]{preport}
 \usepackage[dvipdfmx]{graphicx}
 \graphicspath{{figs/}}
 
-\title{1192年度 研究要旨: \\
-プログレスレポートのテンプレート}
-\author{1192年 源頼朝}
+\title{創造情報学特論II レポート課題}
+\author{創造情報学専攻 稲葉・岡田研究室\\
+  48186619 伊藤秀朗\\
+  itohdak@gmail.com}
 
 \begin{document}
 
@@ -13,44 +14,60 @@
 \thispagestyle{empty}
 \sloppy
 
-\section{はじめに}
+%% \section{はじめに}
 
-本稿はプログレスレポートのテンプレートである\cite{Sakai}．
+\section{自分の研究のテーマとその目的}
+自分はヒューマノイドロボットによる対人協調作業というテーマで研究を行っている．そのモチベーションとしては，将来ロボットが生活環境に進出してくる中で，人間とロボットによる共同作業というものは必ず必要になってくると考えるからである．その前提として，ロボットは人間の思うように動いて欲しいという要望がある．日々の生活において，ロボットにどのような特性を持たせればそれが可能になるのか，興味のあるところである．対称性があるような単純な協調作業では，ロボットは目の前の人間の真似をすることにより目的の操作が実現できそうである．事実，幼い子どもとシーツをたたむなどの作業を一緒にしようという場合，子どもは大人の見様見真似で手を動かす様子は想像できる．\par
+一方，対称性がはっきりと存在しないような作業やある一連の流れの作業の一部をロボットが動的に手伝うような場合はそれだけでは難しそうだ．人間の命令によって，ロボットの手を上下左右に動けるようなシステムを用意しておけば，自由度という面では上がりそうである．しかし，果たしてそれが現実的かという問題もある．ロボットは出来る限り自律的に動作してほしいものだ．\par
+動作が上達してくると，予測が必要になってくるのもまた事実である．
 
-本稿における「、」や「。」は、\verb|make pub|を実行することで、「，」や「．」に変更される。
+\section{HSRを用いたシミュレーション}
+HSRを用いて，床に落ちている赤・青・黄・白の色付きのブロックを拾い，それを箱まで運んで入れる，という片付け動作をシミュレーション環境でプログラムした．このプログラムを考える際に，必要なポイントは大きく分けて以下の2つである．
+\begin{enumerate}
+  \item ブロックの認識とその3次元位置の取得
+  \item ロボットがブロックを持ち上げる際の動作計画
+\end{enumerate}
+\par1つ目の，ブロックの認識において最も単純な方法は，ブロックの色を認識することである．画像内でその色がどこに分布するかが分かれば，depth画像と照らし合わせることでその3次元位置も抽出できる．それを赤・青・黄・白について同様にすればよい．そこで必要なのは，各色を識別するノードである．サンプルプログラムに赤のブロックをカラーフィルタを用いて認識・把持するものがあったので，これに倣い，カラーフィルタのパラメータのみを他の青・黄・白用に人力で調整してやればよい．この方法でシミュレーション上の所望の片付け動作が実現できる．\par
+しかし，自分はこのカラーフィルタの調整を4回繰り返すのはやや煩わしかったため別の方法をとった．それは逆に床の色を識別し，それに認識されなかったクラスタを対象の物体であると考える方法である．行ったことは，上記とほぼ同じで，違いは床の色にチューニングされたカラーフィルタを通して得たマスク画像を反転することで，その上のオブジェクトを浮き上がらせることである．そうすることで，各々のオブジェクトの色に合わせてパラメータのチューニングを行わないで，床の色のチューニングだけですむ．\par
 
-図は\figref{nowprinting}や\tabref{sample}として参照する．
+\section{}
 
-\begin{figure}[tbh]
- \begin{center}
-  \begin{minipage}{0.3\columnwidth}
-   \includegraphics[width=\columnwidth]{nowprinting.eps}
-   \caption{eps図の参考例}
-  \end{minipage}
-  \hspace{0.15\columnwidth}
-  \begin{minipage}{0.3\columnwidth}
-   \includegraphics[width=\columnwidth]{dj.jpg}
-   \caption{jpg図の参考例}
-  \end{minipage}
-  \label{figure:nowprinting}
- \end{center}
-\end{figure}
+%% 本稿はプログレスレポートのテンプレートである\cite{Sakai}．
 
-\begin{table}[tbh]
- \begin{center}
-  \begin{tabular}{|l|r|} \hline
-  A1 & B1 \\
-  A2 & B2 \\ \hline
-  \end{tabular}
-  \caption{図の参考例}
-  \label{table:sample}
- \end{center}
-\end{table}
+%% 本稿における「、」や「。」は、\verb|make pub|を実行することで、「，」や「．」に変更される。
 
-\section{おわりに}
+%% 図は\figref{nowprinting}や\tabref{sample}として参照する．
+
+%% \begin{figure}[tbh]
+%%  \begin{center}
+%%   \begin{minipage}{0.3\columnwidth}
+%%    \includegraphics[width=\columnwidth]{nowprinting.eps}
+%%    \caption{eps図の参考例}
+%%   \end{minipage}
+%%   \hspace{0.15\columnwidth}
+%%   \begin{minipage}{0.3\columnwidth}
+%%    \includegraphics[width=\columnwidth]{dj.jpg}
+%%    \caption{jpg図の参考例}
+%%   \end{minipage}
+%%   \label{figure:nowprinting}
+%%  \end{center}
+%% \end{figure}
+
+%% \begin{table}[tbh]
+%%  \begin{center}
+%%   \begin{tabular}{|l|r|} \hline
+%%   A1 & B1 \\
+%%   A2 & B2 \\ \hline
+%%   \end{tabular}
+%%   \caption{図の参考例}
+%%   \label{table:sample}
+%%  \end{center}
+%% \end{table}
+
+%% \section{おわりに}
 
 \bibliographystyle{junsrt}
-\bibliography{p-report}
+%% \bibliography{p-report}
 
 \end{document}
 

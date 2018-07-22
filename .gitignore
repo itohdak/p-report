@@ -130,6 +130,7 @@ Session.vim
 # *.ps
 # *.eps
 # *.pdf
+p-report.pdf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
