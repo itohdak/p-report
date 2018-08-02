@@ -2,9 +2,8 @@
 \usepackage[dvipdfmx]{graphicx}
 \graphicspath{{figs/}}
 
-\title{1192年度 研究要旨: \\
-プログレスレポートのテンプレート}
-\author{1192年 源頼朝}
+\title{Cloud Fundamentals: Final Report}
+\author{48186619 Hideaki Ito}
 
 \begin{document}
 
@@ -13,44 +12,105 @@
 \thispagestyle{empty}
 \sloppy
 
-\section{はじめに}
+\section{Latency introduced by Transport Initialization}
+Startup latency arises from the time to complete a protocol handshake (e.g. at the start of a TCP, SCTP or DCCP connection).
+Communication options, even latency reducing options, may need to be negotiated at the start of the session.
+These include features such as Explicit Congestion Notification (ECN).
+\begin{enumerate}
+\item ECN\par
+  ECN is an extension to the Internet Protocol and to the Transmission Control Protocol. ECN allows end-to-end notification of network congestion without dropping packets. Conventionally, TCP/IP networks signal congestion by dropping packets. When ECN is successfully negotiated, an ECN-aware router may set a mark in the IP header instead of dropping a packet in order to signal impending congestion. The receiver of the packet echoes the congestion indication to the sender, which reduces its transmission rate as if it detected a dropped packet. However, negotiation of ECN can potentially add startup latency.
+\end{enumerate}
 
-本稿はプログレスレポートのテンプレートである\cite{Sakai}．
 
-本稿における「、」や「。」は、\verb|make pub|を実行することで、「，」や「．」に変更される。
+%% The impact of startup latency can be mitigated by reducing the number of sequential protocol exchanges, and by multiplexing data over an existing session or by persistent use of a session (rather than opening and closing a session for each transfer)
+.
 
-図は\figref{nowprinting}や\tabref{sample}として参照する．
+\subsection{Parallel option negotiation}
+\begin{enumerate}
+ \item Happy Eyeballs\par
+   Happy Eyeballs allows simultaneous attempts to connect using IPv4 and IPv6. This appears to double the number of connection attempts, but by using a caching strategy to store previous successful connectivity, the algorithm can minimize the number of attempts and offer substantial delay improvement.
+ \item SCTP and TCP
+\end{enumerate}
 
-\begin{figure}[tbh]
- \begin{center}
-  \begin{minipage}{0.3\columnwidth}
-   \includegraphics[width=\columnwidth]{nowprinting.eps}
-   \caption{eps図の参考例}
-  \end{minipage}
-  \hspace{0.15\columnwidth}
-  \begin{minipage}{0.3\columnwidth}
-   \includegraphics[width=\columnwidth]{dj.jpg}
-   \caption{jpg図の参考例}
-  \end{minipage}
-  \label{figure:nowprinting}
- \end{center}
-\end{figure}
+\subsection{Reducing NAT setup delay}
+\begin{enumerate}
+ \item SIP\par
+   The Session Initiation Protocol (SIP) is a signalling protocol used for initiating maintaining and terminating real-time sessions that include voice, video and messaging applications. SIP is used for signaling and controlling multimedia communication sessions in applications of Internet telephony for voice and video calls, in private IP telephone systems, in instant messaging over Internet Protocol (IP) networks as well as mobile phone calling over LTE (VoLTE).
+ \item P2P-SIP\par
+   Peer-to-peer SIP (P2P-SIP) is an implementation of a distributed voice over Internet Protocol (VoIP) or instant messaging communications application using a peer-to-peer (P2P) architecture in which session control between communication end points is facilitated with the Session Initiation Protocol (SIP).
+ \item ICE\par
+   Interactive Connectivity Establishment (ICE) is a technique used in computer networking to find ways for two computers to talk to each other as directly as possible in peer-to-peer networking. This is most commonly used for interactive media such as Voice over Internet Protocol (VoIP), peer-to-peer communications, video, and instant messaging. In such applications, you want to avoid communicating through a central server (which would slow down communication, and be expensive), but direct communication between client applications on the Internet is very tricky due to network address translators (NATs), firewalls, and other network barriers.
+ \item TURN\par
+   Traversal Using Relays around NAT (TURN) is a protocol that assists in traversal of network address translators (NAT) or firewalls for multimedia applications. It may be used with the Transmission Control Protocol (TCP) and User Datagram Protocol (UDP). It is most useful for clients on networks masqueraded by symmetric NAT devices. TURN does not aid in running servers on well known ports in the private network through a NAT; it supports the connection of a user behind a NAT to only a single peer, as in telephony, for example.
+\end{enumerate}
 
-\begin{table}[tbh]
- \begin{center}
-  \begin{tabular}{|l|r|} \hline
-  A1 & B1 \\
-  A2 & B2 \\ \hline
-  \end{tabular}
-  \caption{図の参考例}
-  \label{table:sample}
- \end{center}
-\end{table}
+\subsection{Fast opening of TCP connections}
+\begin{enumerate}
+\item Transaction TCP (T/TCP)\par
+  This protocol is faster than TCP and delivery reliability is comparable to that of TCP. However, T/TCP suffers from several major security problems as described by Charles Hannum in September 1996 and it has not gained widespread popularity.
+\item Historic\par
+\item TCP Fast Open (TFO)\par
+  TCP Fast Open (TFO) is an extension to speed up the opening of successive Transmission Control Protocol (TCP) connections between two endpoints. It works by using a TFO cookie (a TCP option), which is a cryptographic cookie stored on the client and set upon the initial connection with the server. When the client later reconnects, it sends the initial SYN packet along with the TFO cookie data to authenticate itself. If successful, the server may start sending data to the client even before the reception of the final ACK packet of the three-way handshake, skipping that way a round-trip delay and lowering the latency in the start of data transmission.
+\item Further rationale for TFO provided by Radhakrishnan et al.\par
+\item Accelerated Secure Association Protocol (ASAP)\par
+\end{enumerate}
 
-\section{おわりに}
+\subsection{Application pipelining}
+\begin{enumerate}
+ \item Web 2.0\par
+ \item HTTP 1.0\par
+ \item HTTP 1.1\par
+   HTTP/1.1 is a revision of the original HTTP (HTTP/1.0). In HTTP/1.0 a separate connection to the same server is made for every resource request. HTTP/1.1 can reuse a connection multiple times to download images, scripts, stylesheets, etc after the page has been delivered. HTTP/1.1 communications therefore experience less latency as the establishment of TCP connections presents considerable overhead.
+ \item SPDY\par
+   SPDY is a deprecated open-specification networking protocol that was developed primarily at Google for transporting web content. SPDY manipulates HTTP traffic, with particular goals of reducing web page load latency and improving web security. SPDY achieves reduced latency through compression, multiplexing, and prioritization, although this depends on a combination of network and website deployment conditions.
+\end{enumerate}
+
+\subsection{Path MTU discovery}
+\begin{enumerate}
+ \item PMTUD algorithm\par
+   Path MTU Discovery (PMTUD) is usually a computer networking standardized technology that determines the maximum transmission unit (MTU) size on the network path between two Internet Protocol (IP) hosts, in order to avoid IP fragmentation is. PMTUD was originally intended for routers with Internet Protocol version 4 (IPv4). However, in all modern operating systems it is using it at the endpoint. In IPv6, this function is explicitly delegated to the endpoint of the communication session. Many network security devices block all ICMP messages for perceived security benefits, including the errors that are necessary for the proper operation of PMTUD. This can result in connections that complete the TCP three-way handshake correctly, but then hang when data is transferred. This state is referred to as a black hole connection.
+ \item more robust packetization layer PMTUD\par
+   Some implementations of PMTUD attempt to prevent this problem by inferring that large payload packets have been dropped due to MTU rather than because of link congestion. However, in order for the Transmission Control Protocol (TCP) to operate most efficiently, ICMP Unreachable messages (type 3) should be permitted. A robust method for PMTUD that relies on TCP or another protocol to probe the path with progressively larger packets has been standardized in RFC 4821.
+\end{enumerate}
+
+%% \section{はじめに}
+
+%% 本稿はプログレスレポートのテンプレートである\cite{Sakai}．
+
+%% 本稿における「、」や「。」は、\verb|make pub|を実行することで、「，」や「．」に変更される。
+
+%% 図は\figref{nowprinting}や\tabref{sample}として参照する．
+
+%% \begin{figure}[tbh]
+%%  \begin{center}
+%%   \begin{minipage}{0.3\columnwidth}
+%%    \includegraphics[width=\columnwidth]{nowprinting.eps}
+%%    \caption{eps図の参考例}
+%%   \end{minipage}
+%%   \hspace{0.15\columnwidth}
+%%   \begin{minipage}{0.3\columnwidth}
+%%    \includegraphics[width=\columnwidth]{dj.jpg}
+%%    \caption{jpg図の参考例}
+%%   \end{minipage}
+%%   \label{figure:nowprinting}
+%%  \end{center}
+%% \end{figure}
+
+%% \begin{table}[tbh]
+%%  \begin{center}
+%%   \begin{tabular}{|l|r|} \hline
+%%   A1 & B1 \\
+%%   A2 & B2 \\ \hline
+%%   \end{tabular}
+%%   \caption{図の参考例}
+%%   \label{table:sample}
+%%  \end{center}
+%% \end{table}
+
+%% \section{おわりに}
 
 \bibliographystyle{junsrt}
-\bibliography{p-report}
+%% \bibliography{p-report}
 
 \end{document}
 
