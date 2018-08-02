@@ -101,3 +101,5 @@
 \newcommand{\tabref}[1]{Table \ref{table:#1}}
 \newcommand{\secref}[1]{第\ref{section:#1}節}
 
+
+\usepackage{siunitx}
