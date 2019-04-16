@@ -32,7 +32,7 @@
   \begin{center}%
   \let \footnote \thanks
     {\Large \@title \par}%
-    {\large
+    {\Large
       \lineskip .5em%
       \begin{tabular}[t]{c}%
         \@author
