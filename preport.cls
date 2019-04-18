@@ -88,12 +88,12 @@
 \renewcommand{\dbltopfraction}{.9}
 \renewcommand{\dblfloatpagefraction}{.9}
 
-\let\LARGE=\Large
-\let\Large=\large
-\let\large=\normalsize
-\let\normalsize=\small
-\let\small=\footnotesize
-\let\footnotesize=\scriptsize
+%% \let\LARGE=\Large
+%% \let\Large=\large
+%% \let\large=\normalsize
+%% \let\normalsize=\small
+%% \let\small=\footnotesize
+%% \let\footnotesize=\scriptsize
 
 \renewcommand\figurename{Fig.}
 \renewcommand\tablename{Table}
