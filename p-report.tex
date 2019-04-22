@@ -2,10 +2,10 @@
 \usepackage[dvipdfmx]{graphicx}
 \graphicspath{{figs/}}
 
-\usepackage{amsmath}
+\usepackage{amsmath, amssymb}
 \def\vector#1{\mbox{\boldmath $#1$}}
 
-\title{先端データ解析論レポート}
+\title{先端データ解析論 第2回レポート}
 \author{48-186619 伊藤秀朗}
 
 \begin{document}
@@ -15,11 +15,56 @@
 \thispagestyle{empty}
 \sloppy
 
-\section{hoge}
-
+\section{宿題2}
+\def\Phii{\Phi_i}
+\def\phii{\phi_i}
+\def\xv{\vector{x}}
+\def\thetav{\vector{\theta}}
+\def\thetil{\vector{\widehat\theta}}
+線形モデル \(f_{\thetav}(\xv) = \sum_{j=1}^{b}\theta_j\phi_j(\xv)\) を用いたL2正則化回帰に対する最適解
 \begin{align}
-  f(x) = x
+  \thetil &= (\Phi^\top \Phi + \lambda I)^{-1} \Phi^\top \vector{y}
 \end{align}
+を用いて， \((\xv_i, y_i)\) を抜いて学習したパラメータ \(\thetil_i\) は，
+\begin{align}
+  %% \Phii &= \Phi - \vector{t}_i \phi_i^\top \\
+  %% \Phii^\top \Phii &= (\Phi - \vector{t}_i \phi_i^\top)^\top (\Phi - \vector{t}_i \phi_i^\top) \\
+  %% &= (\Phi^\top - \phi_i \vector{t}_i^\top) (\Phi - \vector{t}_i \phi_i^\top) \\
+  %% &= \Phi^\top \Phi - \Phi^\top \vector{t}_i \phi_i^\top - \phi_i \vector{t}_i^\top \Phi + \phi_i \vector{t}_i^\top \vector{t}_i \phi_i^\top \\
+  %% &= \Phi^\top \Phi - \phi_i \phi_i^\top - \phi_i \phi_i^\top + \phi_i \phi_i^\top \\
+  %% &= \Phi^\top \Phi - \phi_i \phi_i^\top \\
+  %% \vector{t}_i &= (0, \cdots, 0, 1, 0, \cdots, 0)^\top \\
+  %% \thetil_i &= (\Phi^\top \Phi + \lambda I - \phi_i \phi_i^\top)^{-1} (\Phi - \vector{t}_i \phi_i^\top)^\top (\vector{y} - y_i \vector{t})
+  \thetil_i &= (\Phi^\top \Phi + \lambda I - \phi_i \phi_i^\top)^{-1} (\Phi^\top \vector{y} - y_i \phi_i)
+\end{align}
+と書ける．
+さらに，\(U = \Phi^\top \Phi + \lambda I, \ \ \alpha_i = \phii^\top U^{-1} \phi_i\) を用いて，
+\begin{align}
+  %% &= (U - \phi_i \phi_i^\top)^{-1} (\Phi^\top - \phi_i \vector{t}_i^\top) (\vector{y} - y_i \vector{t}) \\
+  %% &= (U^{-1} + \frac{U^{-1} \phi_i \phi_i^\top U^{-1}}{1 - \phi_i^\top U^{-1} \phi_i}) (\Phi^\top \vector{y} - y_i \Phi^\top \vector{t} - \phi_i \vector{t}_i^\top \vector{y} + y_i \phi_i \vector{t}_i^\top \vector{t}) \\
+  %% &= (U^{-1} + \frac{U^{-1} \phi_i \phi_i^\top U^{-1}}{1 - \phi_i^\top U^{-1} \phi_i}) (\Phi^\top \vector{y} - y_i \phi_i - \phi_i y_i + y_i \phi_i) \\
+  %% &= (U^{-1} + \frac{U^{-1} \phi_i \phi_i^\top U^{-1}}{1 - \phi_i^\top U^{-1} \phi_i}) (\Phi^\top \vector{y} - y_i \phi_i) \\
+  \thetil_i &= (U - \phi_i \phi_i^\top)^{-1} (\Phi^\top \vector{y} - y_i \phi_i) \\
+  &= \left(U^{-1} + \frac{U^{-1} \phi_i \phi_i^\top U^{-1}}{1 - \phi_i^\top U^{-1} \phi_i}\right) (\Phi^\top \vector{y} - y_i \phi_i) \ \ (\because Sherman\mathchar`-Morrison formula)\\
+  &= \thetil - U^{-1} \phii y_i + \frac{U^{-1} \phii \phii^\top \thetil}{1 - \alpha_i} - \frac{U^{-1} \phii y_i \alpha_i}{1 - \alpha_i} \\
+  &= \thetil + \frac{U^{-1} \phi_i \phi_i^\top \thetil - U^{-1} \phi_i y_i}{1 - \alpha_i}
+  %% \alpha_i &= \phi_i^\top U^{-1} \phi_i \\ \\
+  %%
+\end{align}
+と変形できる．
+よって，このときの \(y_i\) と予測値 \(\phii^\top \thetil_i\) との誤差は，
+\begin{align}
+  \phi_i^\top \thetil_i - y_i &= \phi_i^\top \left( \thetil + \frac{U^{-1} \phi_i \phi_i^\top \thetil - U^{-1} \phi_i y_i}{1 - \alpha_i} \right) - y_i \\
+  &= \frac{1}{1 - \alpha_i} \left[ \left\{ (1 - \alpha_i) + \alpha_i \right\} \phi_i^\top \thetil - \left\{ \alpha_i + (1 - \alpha_i) \right\} y_i \right] \\
+  &= \frac{1}{1 - \alpha_i} (\phi_i^\top \thetil - y_i)
+\end{align}
+と書け，これらの \(1\) から \(n\) の和を取ることで，一つ抜き交差確認法(Leave-One-Out Cross-Validation)における二乗誤差 \(E_{LOOCV}\)は，
+\begin{align}
+  E_{LOOCV} &= \frac{1}{n} \sum_{i=1}^{n} \left[ \frac{1}{1 - \alpha_i} (\phi_i^\top \thetil - y_i) \right]^2 \\
+  &= \frac{1}{n} \| \widetilde{H}^{-1} \left( \Phi^\top U^{-1} \Phi \vector{y} - \vector{y} \right) \|^2 \\
+  &= \frac{1}{n} \| \widetilde{H}^{-1} H \vector{y} \|^2
+\end{align}
+と計算できる．
 
 %% \bibliographystyle{junsrt}
 %% \bibliography{p-report}
