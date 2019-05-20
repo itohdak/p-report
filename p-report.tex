@@ -2,10 +2,10 @@
 \usepackage[dvipdfmx]{graphicx}
 \graphicspath{{figs/}}
 
-\usepackage{amsmath}
+\usepackage{amsmath,amssymb}
 \def\vector#1{\mbox{\boldmath $#1$}}
 
-\title{先端データ解析論レポート}
+\title{先端データ解析論 第5回レポート}
 \author{48-186619 伊藤秀朗}
 
 \begin{document}
@@ -15,11 +15,88 @@
 \thispagestyle{empty}
 \sloppy
 
-\section{hoge}
+\section{宿題1}
 
+\def\Xt{X^\top}
+\def\x{\vector{x}}
+\def\xt{\vector{x}^\top}
+\def\y{\vector{y}}
+\def\thv{\vector{\theta}}
+\def\muv{\vector{\mu}}
+\def\mumin{\vector{\mu}_{-}}
+\def\muplus{\vector{\mu}_{+}}
+\def\nt{n_t}
+\def\nmin{n_{-}}
+\def\nplus{n_{+}}
+
+最小二乗最適化により得られる式
 \begin{align}
-  f(x) = x
+  \Xt X \thv = \Xt \y \label{equation:problem}
 \end{align}
+について考える．右辺の\(\Xt \y\)について，
+\begin{align}
+  \nmin \mumin + \nplus \muplus &= n \mu \\
+  &= \vector{0} \\
+  \therefore \mumin &= - \frac{\nplus}{\nmin} \muplus
+\end{align}
+より，
+\begin{align}
+  \Xt \y &= \sum_{i=1}^n{y_i \x_i} \\
+  &= \sum_{y_i=1}{\x_{i, +}} - \sum_{y_i=-1}{\x_{i, -}} \\
+  &= \nplus \muplus - \nmin \mumin \\
+  &= \nplus \muplus + \nmin \frac{\nplus}{\nmin} \muplus \\
+  \therefore \Xt \y &= 2 \nplus \muplus
+\end{align}
+となる．なお，
+\begin{align}
+  \muplus - \mumin &= \muplus - \frac{\nplus}{\nmin} \muplus \\
+  &= \frac{\nmin - \nplus}{\nmin} \muplus \\
+  \therefore \muplus &= \frac{\nmin}{\nmin - \nplus} (\muplus - \mumin) \label{equation:mu}
+\end{align}
+に留意する．
+次に，左辺の\(\Xt X\)について，
+\begin{align}
+  \Xt X &= \sum_{i=1}^{n}{\x_i \xt_i} \\
+  &= \sum_{y_i=1}{\x_{i, +} \xt_{i, +}} + \sum_{y_i=-1}{\x_{i, -} \xt_{i, -}}
+\end{align}
+と表わせ，まとめて
+\begin{align}
+  t &\in \{+, -\} \nonumber \\
+  y_t &= \begin{cases} 1 & (t=+) \\ -1 & (t=-) \end{cases} \nonumber
+\end{align}
+とおくと，\(\sum_{y_i = y_t}{\x_{i, t} \x_{i, t}^\top}\)について，
+\begin{align}
+  \widehat{\Sigma}_t &= \frac{1}{\nt} \sum_{y_i = y_t}{(\x_{i, t} - \muv_{t}) (\x_{i, t} - \muv_{t})^\top} \\
+  &= \frac{1}{\nt} (\sum_{y_i = y_t}{\x_{i, t} \x_{i, t}^\top} - 2 \muv_{t} \sum_{y_i = y_t}{\x_{i, t}^\top} + \sum_{y_i = y_t}{\muv_t \muv_t^\top}) \\
+  &= \frac{1}{\nt} (\sum_{y_i = y_t}{\x_{i, t} \x_{i, t}^\top} - 2 \nt \muv_{t} \muv_{t}^\top + \nt \muv_t \muv_t^\top) \\
+  &= \frac{1}{\nt} (\sum_{y_i = y_t}{\x_{i, t} \x_{i, t}^\top} - \nt \muv_{t} \muv_{t}^\top)
+\end{align}
+より，
+\begin{align}
+  \sum_{y_i = y_t}{\x_{i, t} \x_{i, t}^\top} &= \nt \widehat{\Sigma}_t + \nt \muv_{t} \muv_{t}^\top
+\end{align}
+と表せるので，
+\begin{align}
+  \Xt X &= (\nplus \widehat{\Sigma}_{+} + \nplus \muplus \muplus^\top) + (\nmin \widehat{\Sigma}_{-} + \nmin \mumin \mumin^\top) \\
+  &= (\nplus + \nmin) \widehat{\Sigma} + \nplus \muplus \muplus^\top + \nmin \left(\frac{\nplus}{\nmin}\right)^2 \muplus \muplus^\top \\
+  &= (\nplus + \nmin) \left( \widehat{\Sigma} + \frac{\nplus}{\nmin} \muplus \muplus^\top \right)
+\end{align}
+となる．これらを式\eqref{equation:problem}に代入すると，
+\begin{align}
+  \Xt X \thv &= \Xt \y \\
+  (\nplus + \nmin) \left( \widehat{\Sigma} + \frac{\nplus}{\nmin} \muplus \muplus^\top \right) \thv &= 2 \nplus \muplus \\
+  \widehat{\Sigma} \thv + \frac{\nplus}{\nmin} \muplus \muplus^\top \thv &= \frac{2 \nplus}{\nplus + \nmin} \muplus \\
+  \widehat{\Sigma} \thv &= \left( \frac{2 \nplus}{\nplus + \nmin} - C_{\muplus, \theta} \cdot \frac{\nplus}{\nmin} \right) \muplus \label{equation:hint} \\
+  \thv &= C \cdot \widehat{\Sigma}^{-1} \muplus \\
+  \thv &= C' \cdot \widehat{\Sigma}^{-1} (\muplus - \mumin) \ \ (\because 式\eqref{equation:mu})
+\end{align}
+よって，最小二乗最適化により得られるベクトル\(\hat{\thv}\)は，フィッシャー判別分析による境界の垂線\(\widehat{\Sigma}^{-1} (\widehat{\vector{\mu}}_{+} - \widehat{\vector{\mu}}_{-})\)の定数倍であることが示された．\par
+ただし，式\eqref{equation:hint}では，任意の\(\vector{v}, \vector{\theta}\)について，ある定数\(c\)が存在し，
+\begin{align}
+  \vector{v} \vector{v}^\top \vector{\theta} = c \cdot \vector{v}
+\end{align}
+が成り立つことを用いた．
+
 
 %% \bibliographystyle{junsrt}
 %% \bibliography{p-report}
